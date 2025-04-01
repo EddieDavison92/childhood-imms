@@ -13,6 +13,20 @@ WITH PatientAge AS (
         p.IsDeleted = 0
         AND DATEDIFF(DAY, p.DateOfBirth, GETDATE()) < 9125 -- Limit to individuals younger than ~25 years
 ),
+-- Define a function to split IncompatibleClusterIDs
+IncompatibleCodesExpanded AS (
+    SELECT 
+        i.VaccineID,
+        i.VaccineName,
+        i.DoseNumber,
+        value AS IncompatibleClusterID
+    FROM 
+        IMMUNISATION_SCHEDULE i
+    CROSS APPLY STRING_SPLIT(i.IncompatibleClusterIDs, ',')
+    WHERE 
+        i.IncompatibleClusterIDs IS NOT NULL 
+        AND i.IncompatibleClusterIDs <> ''
+),
 AllVaccineEvents AS (
     SELECT 
         pa.LDSBusinessId,
@@ -34,7 +48,14 @@ AllVaccineEvents AS (
                  AND DATEDIFF(DAY, pa.DateOfBirth, obs.ClinicalEffectiveDate) > sched.MaximumAgeDays 
             THEN 'Yes' 
             ELSE 'No' 
-        END AS OutOfSchedule
+        END AS OutOfSchedule,
+        -- Determine if this is an incompatible vaccine
+        CASE 
+            WHEN ic.IncompatibleClusterID IS NOT NULL THEN 'Yes'
+            ELSE 'No'
+        END AS IncorrectVaccine,
+        -- Get the ineligibility period if applicable
+        COALESCE(sched.IneligibilityPeriodMonths, 0) AS IneligibilityPeriodMonths
     FROM 
         OBSERVATION obs
     INNER JOIN 
@@ -44,7 +65,11 @@ AllVaccineEvents AS (
             sched.AdministeredClusterID = clut.ClusterID OR
             sched.DrugClusterID = clut.ClusterID OR
             sched.DeclinedClusterID = clut.ClusterID OR
-            sched.ContraindicatedClusterID = clut.ClusterID
+            sched.ContraindicatedClusterID = clut.ClusterID 
+    LEFT JOIN
+        IncompatibleCodesExpanded ic ON sched.VaccineID = ic.VaccineID 
+                                    AND sched.DoseNumber = ic.DoseNumber
+                                    AND clut.ClusterID = ic.IncompatibleClusterID
     INNER JOIN 
         PatientAge pa ON pa.LDSBusinessId = obs.LDSBusinessId
     WHERE 
@@ -57,23 +82,29 @@ SELECT
     ev.DoseNumber,
     ev.EventType,
     ev.EventDate,
-    ev.OutOfSchedule
+    ev.OutOfSchedule,
+    ev.IncorrectVaccine,
+    CASE 
+        WHEN ev.IncorrectVaccine = 'Yes' THEN 
+            DATEADD(MONTH, ev.IneligibilityPeriodMonths, ev.EventDate)
+        ELSE NULL
+    END AS EligibleAgainDate
 FROM 
     AllVaccineEvents ev;
 
 -- Example Output: VaccineEvents
 /*
-LDSBusinessId	VaccineID	VaccineName	        DoseNumber	EventType	        EventDate	    OutOfSchedule
-patientA	    1	        DTaP/IPV/Hib/HepB	1	        Administration	    2020-03-01	    No
-patientA	    1	        DTaP/IPV/Hib/HepB	2	        Administration	    2020-05-01	    No
-patientA	    3	        Rotavirus	        1	        Declined	        NULL	        No
-patientB	    1	        DTaP/IPV/Hib/HepB	1	        Administration	    2018-08-15	    No
-patientB	    1	        DTaP/IPV/Hib/HepB	2	        Administration	    2019-02-15	    No
-patientB	    1	        DTaP/IPV/Hib/HepB	3	        Administration	    2019-06-15	    No
-patientB	    2	        MenB	            1	        Contraindicated 	NULL	        No
-patientC	    4	        Influenza	        1	        Administration	    2021-10-01	    Yes
-patientC	    4	        Influenza	        2	        Administration	    2022-10-01	    No
-patientD	    1	        DTaP/IPV/Hib/HepB	1	        Administration	    2015-07-20	    No
-patientD	    1	        DTaP/IPV/Hib/HepB	2	        Administration	    2016-01-20	    No
-patientD	    2	        MenB	            1	        Contraindicated 	NULL	        No
+LDSBusinessId	VaccineID	VaccineName	        DoseNumber	EventType	        EventDate	    OutOfSchedule	CorrectVaccine	EligibleAgainDate
+patientA	    1	        DTaP/IPV/Hib/HepB	1	        Administration	    2020-03-01	    No	        Yes	        NULL
+patientA	    1	        DTaP/IPV/Hib/HepB	2	        Administration	    2020-05-01	    No	        Yes	        NULL
+patientA	    3	        Rotavirus	        1	        Declined	        NULL	        No	        No	        NULL
+patientB	    1	        DTaP/IPV/Hib/HepB	1	        Administration	    2018-08-15	    No	        Yes	        NULL
+patientB	    1	        DTaP/IPV/Hib/HepB	2	        Administration	    2019-02-15	    No	        Yes	        NULL
+patientB	    1	        DTaP/IPV/Hib/HepB	3	        Administration	    2019-06-15	    No	        Yes	        NULL
+patientB	    2	        MenB	            1	        Contraindicated 	NULL	        No	        No	        NULL
+patientC	    4	        Influenza	        1	        Administration	    2021-10-01	    Yes	        No	        NULL
+patientC	    4	        Influenza	        2	        Administration	    2022-10-01	    No	        No	        NULL
+patientD	    1	        DTaP/IPV/Hib/HepB	1	        Administration	    2015-07-20	    No	        Yes	        NULL
+patientD	    1	        DTaP/IPV/Hib/HepB	2	        Administration	    2016-01-20	    No	        Yes	        NULL
+patientD	    2	        MenB	            1	        Contraindicated 	NULL	        No	        No	        NULL
 */

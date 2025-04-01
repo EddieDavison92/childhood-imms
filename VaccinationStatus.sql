@@ -14,6 +14,7 @@ WITH
             VaccineEvents ve
         WHERE 
             ve.EventType = 'Administration'
+            AND ve.IncorrectVaccine = 'No'  -- Only count correct vaccines
         GROUP BY 
             ve.LDSBusinessId,
             ve.VaccineID
@@ -50,6 +51,22 @@ WITH
             IMMUNISATION_SCHEDULE
         GROUP BY 
             VaccineID
+    ),
+    
+    -- New Step 5: Incorrect Vaccines
+    IncorrectVaccines AS (
+        SELECT 
+            ve.LDSBusinessId,
+            ve.VaccineID,
+            MAX(ve.EventDate) AS LastIncorrectDate,
+            MAX(ve.EligibleAgainDate) AS EligibleAgainDate
+        FROM 
+            VaccineEvents ve
+        WHERE 
+            ve.IncorrectVaccine = 'Yes'
+        GROUP BY 
+            ve.LDSBusinessId,
+            ve.VaccineID
     )
 SELECT 
     ev.LDSBusinessId,
@@ -57,15 +74,19 @@ SELECT
     CASE 
         WHEN cv.VaccineID IS NOT NULL THEN 'Contraindicated'
         WHEN dv.VaccineID IS NOT NULL THEN 'Declined'
+        -- Add the new Incomplete Course status
+        WHEN iv.VaccineID IS NOT NULL THEN 'Incomplete Course'
         WHEN ad.AdministeredCount < rd.TotalDoses THEN 'Missed'
         WHEN ad.AdministeredCount >= rd.TotalDoses THEN 'Completed'
         ELSE 'Eligible and Due'
     END AS VaccinationStatus,
-    ad.LastAdministeredDate AS DateVaccinated,
+    COALESCE(ad.LastAdministeredDate, iv.LastIncorrectDate) AS DateVaccinated,
     CASE 
         WHEN ve.OutOfSchedule = 'Yes' THEN 'Yes' 
         ELSE 'No' 
-    END AS OutOfSchedule
+    END AS OutOfSchedule,
+    -- Add new column for when patient will be eligible again
+    iv.EligibleAgainDate AS NextEligibleDate
 FROM 
     EligibleVaccinations ev
 LEFT JOIN 
@@ -77,6 +98,9 @@ LEFT JOIN
 LEFT JOIN 
     ContraindicatedVaccines cv 
     ON ev.LDSBusinessId = cv.LDSBusinessId AND ev.VaccineID = cv.VaccineID
+LEFT JOIN 
+    IncorrectVaccines iv
+    ON ev.LDSBusinessId = iv.LDSBusinessId AND ev.VaccineID = iv.VaccineID
 LEFT JOIN 
     RequiredDoses rd 
     ON ev.VaccineID = rd.VaccineID
@@ -91,16 +115,16 @@ ORDER BY
 
 -- Example Output: VaccinationStatusReport
 /*
-LDSBusinessId	VaccineName	        VaccinationStatus	DateVaccinated	OutOfSchedule
-patientA	    DTaP/IPV/Hib/HepB	Missed	            NULL	        No
-patientA	    MenB	            Eligible and Due	NULL	        No
-patientA	    Rotavirus	        Declined	        NULL	        No
-patientB	    DTaP/IPV/Hib/HepB	Completed	        2019-06-15	    No
-patientB	    MenB	            Contraindicated 	NULL	        No
-patientB	    Rotavirus	        Eligible and Due	NULL	        No
-patientC	    Influenza	        Completed	        2022-10-01	    Yes
-patientC	    Influenza	        Eligible and Due	NULL	        No
-patientD	    DTaP/IPV/Hib/HepB	Missed	            NULL	        No
-patientD	    MenB	            Missed	            NULL	        No
-patientD	    Rotavirus	        Eligible and Due	NULL	        No
+LDSBusinessId	VaccineName	        VaccinationStatus	DateVaccinated	OutOfSchedule	NextEligibleDate
+patientA	    DTaP/IPV/Hib/HepB	Missed	            NULL	        No	        NULL
+patientA	    MenB	            Eligible and Due	NULL	        No	        NULL
+patientA	    Rotavirus	        Declined	        NULL	        No	        NULL
+patientB	    DTaP/IPV/Hib/HepB	Completed	        2019-06-15	    No	        NULL
+patientB	    MenB	            Contraindicated 	NULL	        No	        NULL
+patientB	    Rotavirus	        Eligible and Due	NULL	        No	        NULL
+patientC	    Influenza	        Completed	        2022-10-01	    Yes	        NULL
+patientC	    Influenza	        Eligible and Due	NULL	        No	        NULL
+patientD	    DTaP/IPV/Hib/HepB	Missed	            NULL	        No	        NULL
+patientD	    MenB	            Missed	            NULL	        No	        NULL
+patientD	    Rotavirus	        Eligible and Due	NULL	        No	        NULL
 */

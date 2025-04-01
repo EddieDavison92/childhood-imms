@@ -1,20 +1,20 @@
-VaccineID,VaccineName,DoseNumber,DiseasesProtectedAgainst,VaccineCode,TradeName,AdministrationRoute,ScheduleAge,MinimumAgeDays,MaximumAgeDays,MinimumIntervalDays,NextDoseVaccineID,EligibleAgeFromDays,EligibleAgeToDays,AdministeredClusterID,DrugClusterID,DeclinedClusterID,ContraindicatedClusterID
-1,DTaP/IPV/Hib/HepB,1,"Diphtheria, tetanus, pertussis, polio, Hib, hepatitis B",DTaP/IPV/Hib/HepB,Infanrix hexa or Vaxelis,Intramuscular,8 weeks,56,365,0,4,56,365,6IN1_ADM,6IN1_DRUG,6IN1_DEC,6IN1_CONTRA
-2,MenB,1,Meningococcal group B,MenB,Bexsero,Intramuscular,8 weeks,56,365,0,8,56,365,MenB_ADM,MenB_DRUG,MenB_DEC,MenB_CONTRA
-3,Rotavirus,1,Rotavirus gastroenteritis,Rotavirus,Rotarix,By mouth,8 weeks,56,104,0,6,56,104,Rotavirus_ADM,Rotavirus_DRUG,Rotavirus_DEC,Rotavirus_CONTRA
-4,DTaP/IPV/Hib/HepB,2,"Diphtheria, tetanus, pertussis, polio, Hib, hepatitis B",DTaP/IPV/Hib/HepB,Infanrix hexa or Vaxelis,Intramuscular,12 weeks,84,365,28,7,84,365,4IN1_ADM,4IN1_DRUG,4IN1_DEC,4IN1_CONTRA
-5,PCV,1,Pneumococcal disease (13 serotypes),PCV,Prevenar 13,Intramuscular,12 weeks,84,365,0,10,84,365,PCV_ADM,PCV_DRUG,PCV_DEC,PCV_CONTRA
-6,Rotavirus,2,Rotavirus gastroenteritis,Rotavirus,Rotarix,By mouth,12 weeks,84,168,28,NULL,84,168,Rotavirus_ADM,Rotavirus_DRUG,Rotavirus_DEC,Rotavirus_CONTRA
-7,DTaP/IPV/Hib/HepB,3,"Diphtheria, tetanus, pertussis, polio, Hib, hepatitis B",DTaP/IPV/Hib/HepB,Infanrix hexa or Vaxelis,Intramuscular,16 weeks,112,365,28,NULL,112,365,4IN1_ADM,4IN1_DRUG,4IN1_DEC,4IN1_CONTRA
-8,MenB,2,Meningococcal group B,MenB,Bexsero,Intramuscular,16 weeks,112,365,56,12,112,365,MenB_ADM,MenB_DRUG,MenB_DEC,MenB_CONTRA
-9,Hib/MenC,Booster,Hib and Meningococcal group C,Hib/MenC,Menitorix,Intramuscular,12 months,365,1460,0,NULL,365,1460,HibMenC_ADM,HibMenC_DRUG,HibMenC_DEC,HibMenC_CONTRA
-10,PCV booster,Booster,Pneumococcal disease,PCV booster,Prevenar 13,Intramuscular,12 months,365,730,0,NULL,365,730,PCVBooster_ADM,PCVBooster_DRUG,PCVBooster_DEC,PCVBooster_CONTRA
-11,MMR,1,"Measles, mumps, rubella",MMR,MMRvaxPro or Priorix,Subcutaneous or Intramuscular,12 months,365,1825,0,15,365,1825,MMR_ADM,MMR_DRUG,MMR_DEC,MMR_CONTRA
-12,MenB booster,Booster,Meningococcal group B,MenB booster,Bexsero,Intramuscular,12 months,365,730,0,NULL,365,730,MenBBooster_ADM,MenBBooster_DRUG,MenBBooster_DEC,MenBBooster_CONTRA
-13,LAIV,Annual,Influenza,LAIV,Fluenz Tetra,Intranasal,From 2 years,730,6205,0,NULL,730,6205,LAIV_ADM,LAIV_DRUG,LAIV_DEC,LAIV_CONTRA
-14,dTaP/IPV,Booster,"Diphtheria, tetanus, pertussis, polio",dTaP/IPV,Boostrix-IPV,Intramuscular,3 years 4 months,1218,2190,0,NULL,1218,2190,DTAPIPV_ADM,DTAPIPV_DRUG,DTAPIPV_DEC,DTAPIPV_CONTRA
-15,MMR,2,"Measles, mumps, rubella",MMR,MMRvaxPro or Priorix,Subcutaneous or Intramuscular,3 years 4 months,1218,6570,0,NULL,1218,6570,MMR_ADM,MMR_DRUG,MMR_DEC,MMR_CONTRA
-16,HPV,1,HPV-related cancers and genital warts,HPV,Gardasil 9,Intramuscular,12-13 years,4380,6570,0,17,4380,6570,HPV_ADM,HPV_DRUG,HPV_DEC,HPV_CONTRA
-17,HPV,2,HPV-related cancers and genital warts,HPV,Gardasil 9,Intramuscular,6-24 months after first dose,4560,6570,168,NULL,4560,6570,HPV_ADM,HPV_DRUG,HPV_DEC,HPV_CONTRA
-18,Td/IPV,Booster,"Tetanus, diphtheria, polio",Td/IPV,Revaxis,Intramuscular,14 years,5110,6570,0,NULL,5110,6570,TdIPV_ADM,TdIPV_DRUG,TdIPV_DEC,TdIPV_CONTRA
-19,MenACWY,1,"Meningococcal groups A, C, W, and Y",MenACWY,MenQuadfi,Intramuscular,14 years,5110,9125,0,NULL,5110,9125,MenACWY_ADM,MenACWY_DRUG,MenACWY_DEC,MenACWY_CONTRA
+VaccineID,VaccineName,DoseNumber,DiseasesProtectedAgainst,VaccineCode,TradeName,AdministrationRoute,ScheduleAge,MinimumAgeDays,MaximumAgeDays,MinimumIntervalDays,NextDoseVaccineID,EligibleAgeFromDays,EligibleAgeToDays,AdministeredClusterID,DrugClusterID,DeclinedClusterID,ContraindicatedClusterID,IncompatibleClusterIDs,IneligibilityPeriodMonths
+1,DTaP/IPV/Hib/HepB,1,"Diphtheria, tetanus, pertussis, polio, Hib, hepatitis B",DTaP/IPV/Hib/HepB,Infanrix hexa or Vaxelis,Intramuscular,8 weeks,56,365,0,4,56,365,6IN1_ADM,6IN1_DRUG,6IN1_DEC,6IN1_CONTRA,"4IN1_ADM,5IN1_ADM,DTAPIPV_ADM",12
+2,MenB,1,Meningococcal group B,MenB,Bexsero,Intramuscular,8 weeks,56,365,0,8,56,365,MenB_ADM,MenB_DRUG,MenB_DEC,MenB_CONTRA,,0
+3,Rotavirus,1,Rotavirus gastroenteritis,Rotavirus,Rotarix,By mouth,8 weeks,56,104,0,6,56,104,Rotavirus_ADM,Rotavirus_DRUG,Rotavirus_DEC,Rotavirus_CONTRA,,0
+4,DTaP/IPV/Hib/HepB,2,"Diphtheria, tetanus, pertussis, polio, Hib, hepatitis B",DTaP/IPV/Hib/HepB,Infanrix hexa or Vaxelis,Intramuscular,12 weeks,84,365,28,7,84,365,6IN1_ADM,6IN1_DRUG,6IN1_DEC,6IN1_CONTRA,"4IN1_ADM,5IN1_ADM,DTAPIPV_ADM",12
+5,PCV,1,Pneumococcal disease (13 serotypes),PCV,Prevenar 13,Intramuscular,12 weeks,84,365,0,10,84,365,PCV_ADM,PCV_DRUG,PCV_DEC,PCV_CONTRA,,0
+6,Rotavirus,2,Rotavirus gastroenteritis,Rotavirus,Rotarix,By mouth,12 weeks,84,168,28,NULL,84,168,Rotavirus_ADM,Rotavirus_DRUG,Rotavirus_DEC,Rotavirus_CONTRA,,0
+7,DTaP/IPV/Hib/HepB,3,"Diphtheria, tetanus, pertussis, polio, Hib, hepatitis B",DTaP/IPV/Hib/HepB,Infanrix hexa or Vaxelis,Intramuscular,16 weeks,112,365,28,NULL,112,365,6IN1_ADM,6IN1_DRUG,6IN1_DEC,6IN1_CONTRA,"4IN1_ADM,5IN1_ADM,DTAPIPV_ADM",12
+8,MenB,2,Meningococcal group B,MenB,Bexsero,Intramuscular,16 weeks,112,365,56,12,112,365,MenB_ADM,MenB_DRUG,MenB_DEC,MenB_CONTRA,,0
+9,Hib/MenC,Booster,Hib and Meningococcal group C,Hib/MenC,Menitorix,Intramuscular,12 months,365,1460,0,NULL,365,1460,HibMenC_ADM,HibMenC_DRUG,HibMenC_DEC,HibMenC_CONTRA,,0
+10,PCV booster,Booster,Pneumococcal disease,PCV booster,Prevenar 13,Intramuscular,12 months,365,730,0,NULL,365,730,PCVBooster_ADM,PCVBooster_DRUG,PCVBooster_DEC,PCVBooster_CONTRA,,0
+11,MMR,1,"Measles, mumps, rubella",MMR,MMRvaxPro or Priorix,Subcutaneous or Intramuscular,12 months,365,1825,0,15,365,1825,MMR_ADM,MMR_DRUG,MMR_DEC,MMR_CONTRA,,0
+12,MenB booster,Booster,Meningococcal group B,MenB booster,Bexsero,Intramuscular,12 months,365,730,0,NULL,365,730,MenBBooster_ADM,MenBBooster_DRUG,MenBBooster_DEC,MenBBooster_CONTRA,,0
+13,LAIV,Annual,Influenza,LAIV,Fluenz Tetra,Intranasal,From 2 years,730,6205,0,NULL,730,6205,LAIV_ADM,LAIV_DRUG,LAIV_DEC,LAIV_CONTRA,,0
+14,dTaP/IPV,Booster,"Diphtheria, tetanus, pertussis, polio",dTaP/IPV,Boostrix-IPV,Intramuscular,3 years 4 months,1218,2190,0,NULL,1218,2190,DTAPIPV_ADM,DTAPIPV_DRUG,DTAPIPV_DEC,DTAPIPV_CONTRA,,0
+15,MMR,2,"Measles, mumps, rubella",MMR,MMRvaxPro or Priorix,Subcutaneous or Intramuscular,3 years 4 months,1218,6570,0,NULL,1218,6570,MMR_ADM,MMR_DRUG,MMR_DEC,MMR_CONTRA,,0
+16,HPV,1,HPV-related cancers and genital warts,HPV,Gardasil 9,Intramuscular,12-13 years,4380,6570,0,17,4380,6570,HPV_ADM,HPV_DRUG,HPV_DEC,HPV_CONTRA,,0
+17,HPV,2,HPV-related cancers and genital warts,HPV,Gardasil 9,Intramuscular,6-24 months after first dose,4560,6570,168,NULL,4560,6570,HPV_ADM,HPV_DRUG,HPV_DEC,HPV_CONTRA,,0
+18,Td/IPV,Booster,"Tetanus, diphtheria, polio",Td/IPV,Revaxis,Intramuscular,14 years,5110,6570,0,NULL,5110,6570,TdIPV_ADM,TdIPV_DRUG,TdIPV_DEC,TdIPV_CONTRA,,0
+19,MenACWY,1,"Meningococcal groups A, C, W, and Y",MenACWY,MenQuadfi,Intramuscular,14 years,5110,9125,0,NULL,5110,9125,MenACWY_ADM,MenACWY_DRUG,MenACWY_DEC,MenACWY_CONTRA,,0
