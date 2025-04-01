@@ -55,7 +55,14 @@ AllVaccineEvents AS (
             ELSE 'No'
         END AS IncorrectVaccine,
         -- Get the ineligibility period if applicable
-        COALESCE(sched.IneligibilityPeriodMonths, 0) AS IneligibilityPeriodMonths
+        COALESCE(sched.IneligibilityPeriodMonths, 0) AS IneligibilityPeriodMonths,
+        -- Add the explanation from the schedule
+        CASE
+            WHEN ic.IncompatibleClusterID IS NOT NULL THEN sched.IncompatibleExplanation
+            ELSE NULL
+        END AS IncompleteReason,
+        -- Store the actual code used for reference
+        clut.ClusterID AS CodeUsed
     FROM 
         OBSERVATION obs
     INNER JOIN 
@@ -88,23 +95,27 @@ SELECT
         WHEN ev.IncorrectVaccine = 'Yes' THEN 
             DATEADD(MONTH, ev.IneligibilityPeriodMonths, ev.EventDate)
         ELSE NULL
-    END AS EligibleAgainDate
+    END AS EligibleAgainDate,
+    ev.IncompleteReason,
+    ev.CodeUsed
 FROM 
     AllVaccineEvents ev;
 
 -- Example Output: VaccineEvents
 /*
-LDSBusinessId	VaccineID	VaccineName	        DoseNumber	EventType	        EventDate	    OutOfSchedule	CorrectVaccine	EligibleAgainDate
-patientA	    1	        DTaP/IPV/Hib/HepB	1	        Administration	    2020-03-01	    No	        Yes	        NULL
-patientA	    1	        DTaP/IPV/Hib/HepB	2	        Administration	    2020-05-01	    No	        Yes	        NULL
-patientA	    3	        Rotavirus	        1	        Declined	        NULL	        No	        No	        NULL
-patientB	    1	        DTaP/IPV/Hib/HepB	1	        Administration	    2018-08-15	    No	        Yes	        NULL
-patientB	    1	        DTaP/IPV/Hib/HepB	2	        Administration	    2019-02-15	    No	        Yes	        NULL
-patientB	    1	        DTaP/IPV/Hib/HepB	3	        Administration	    2019-06-15	    No	        Yes	        NULL
-patientB	    2	        MenB	            1	        Contraindicated 	NULL	        No	        No	        NULL
-patientC	    4	        Influenza	        1	        Administration	    2021-10-01	    Yes	        No	        NULL
-patientC	    4	        Influenza	        2	        Administration	    2022-10-01	    No	        No	        NULL
-patientD	    1	        DTaP/IPV/Hib/HepB	1	        Administration	    2015-07-20	    No	        Yes	        NULL
-patientD	    1	        DTaP/IPV/Hib/HepB	2	        Administration	    2016-01-20	    No	        Yes	        NULL
-patientD	    2	        MenB	            1	        Contraindicated 	NULL	        No	        No	        NULL
+LDSBusinessId  VaccineID  VaccineName         DoseNumber  EventType       EventDate     OutOfSchedule  IncorrectVaccine  EligibleAgainDate  IncompleteReason                                                          CodeUsed
+patientA       1          DTaP/IPV/Hib/HepB   1           Administration  2020-03-01    No             No                NULL               NULL                                                                      6IN1_ADM
+patientA       1          DTaP/IPV/Hib/HepB   2           Administration  2020-05-01    No             No                NULL               NULL                                                                      6IN1_ADM
+patientA       3          Rotavirus           1           Declined        NULL          No             No                NULL               NULL                                                                      Rotavirus_DEC
+patientB       1          DTaP/IPV/Hib/HepB   1           Administration  2018-08-15    No             No                NULL               NULL                                                                      6IN1_ADM
+patientB       1          DTaP/IPV/Hib/HepB   2           Administration  2019-02-15    No             No                NULL               NULL                                                                      6IN1_ADM
+patientB       1          DTaP/IPV/Hib/HepB   3           Administration  2019-06-15    No             No                NULL               NULL                                                                      6IN1_ADM
+patientB       2          MenB                1           Contraindicated NULL          No             No                NULL               NULL                                                                      MenB_CONTRA
+patientC       1          DTaP/IPV/Hib/HepB   1           Administration  2021-05-15    No             Yes               2022-05-15         Missing Hib and/or HepB protection. Recommend 6-in-1 dose after ineligibility period.  4IN1_ADM
+patientC       14         dTaP/IPV            Booster     Administration  2021-06-01    Yes            No                NULL               NULL                                                                      DTAPIPV_ADM
+patientD       1          DTaP/IPV/Hib/HepB   1           Administration  2015-07-20    No             No                NULL               NULL                                                                      6IN1_ADM
+patientD       1          DTaP/IPV/Hib/HepB   2           Administration  2016-01-20    No             No                NULL               NULL                                                                      6IN1_ADM
+patientE       1          DTaP/IPV/Hib/HepB   1           Administration  2022-04-10    No             Yes               2023-04-10         Missing Hib and/or HepB protection. Recommend 6-in-1 dose after ineligibility period.  5IN1_ADM
+patientE       14         dTaP/IPV            Booster     Administration  2022-04-10    Yes            No                NULL               NULL                                                                      DTAPIPV_ADM
+patientF       1          DTaP/IPV/Hib/HepB   1           Administration  2021-09-01    No             Yes               2022-09-01         Missing Hib and/or HepB protection. Recommend 6-in-1 dose after ineligibility period.  4IN1_ADM
 */
